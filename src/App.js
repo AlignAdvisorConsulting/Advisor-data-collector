@@ -351,14 +351,14 @@ const datumRule = { position: 'absolute', left: 0, top: 4, bottom: 4, width: 4, 
    Back/Next always walk the SAME array, keeping currentQ tracking
    correct across segment boundaries.
 --------------------------------------------------------------- */
-function buildSteps(intro) {
+function buildSteps(hasSegments, numSegmentsInput) {
   const steps = [{ id: 'firmName' }, { id: 'hasSegments' }];
-  if (intro.hasSegments === 'yes') steps.push({ id: 'segCount' }, { id: 'segApproach' });
+  if (hasSegments === 'yes') steps.push({ id: 'segCount' }, { id: 'segApproach' });
 
-  const numSegments = intro.hasSegments === 'no' ? 1 : (intro.numSegments || 0);
+  const numSegments = hasSegments === 'no' ? 1 : (numSegmentsInput || 0);
 
   const perSegmentIds = [
-    ...(intro.hasSegments === 'yes' ? ['name'] : []),
+    ...(hasSegments === 'yes' ? ['name'] : []),
     'persona', 'objective', 'feeModel', 'feeAmount',
     'servicingTeam', 'teamAccess', 'responseSLA',
     'inPersonMeetings', 'meetingTypes',
@@ -386,7 +386,7 @@ export default function App() {
   const [segments, setSegments] = useState([]);
   const [error, setError] = useState('');
 
-  const steps = useMemo(() => buildSteps(intro), [intro.hasSegments, intro.numSegments]);
+  const steps = useMemo(() => buildSteps(intro.hasSegments, intro.numSegments), [intro.hasSegments, intro.numSegments]);
   const safeStepIndex = Math.min(stepIndex, steps.length - 1);
   const step = steps[safeStepIndex];
 
