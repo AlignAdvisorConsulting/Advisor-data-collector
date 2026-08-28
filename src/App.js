@@ -860,11 +860,15 @@ function Preview({ intro, segments, onBack, onStartOver }) {
 
   return (
     <div style={{ minHeight: '100vh', background: COLOR.paper, fontFamily: FONT_BODY, display: 'flex', flexDirection: 'column' }}>
+      <style>{PRINT_STYLES}</style>
       <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '32px 16px 40px' }}>
         <div style={{ width: '100%', maxWidth: 900 }}>
           <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <SecondaryButton onClick={onBack}>Back</SecondaryButton>
-            <PrimaryButton onClick={onStartOver}>Start over</PrimaryButton>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <SecondaryButton onClick={() => window.print()}>Print / Save as PDF</SecondaryButton>
+              <PrimaryButton onClick={onStartOver}>Start over</PrimaryButton>
+            </div>
           </div>
 
           <h1 style={{ fontFamily: FONT_HEAD, fontSize: 34, color: COLOR.oxblood, marginBottom: 6, lineHeight: 1.2 }}>{title}</h1>
@@ -873,10 +877,12 @@ function Preview({ intro, segments, onBack, onStartOver }) {
           <SectionHeading>Service Segments Overview</SectionHeading>
           <ServiceMatrix intro={intro} segments={segments} />
 
-          <SectionHeading>Per-Segment Annual Service Calendars</SectionHeading>
-          {segments.map((seg, i) => (
-            <SegmentCalendar key={i} seg={seg} label={intro.hasSegments === 'no' ? 'Client Service' : (seg.name || `Segment ${i + 1}`)} />
-          ))}
+          <div className="print-page-break">
+            <SectionHeading>Per-Segment Annual Service Calendars</SectionHeading>
+            {segments.map((seg, i) => (
+              <SegmentCalendar key={i} seg={seg} label={intro.hasSegments === 'no' ? 'Client Service' : (seg.name || `Segment ${i + 1}`)} />
+            ))}
+          </div>
 
           <SectionHeading>Next Steps</SectionHeading>
           <div style={{ background: COLOR.tanLight, borderRadius: 10, padding: '20px 22px', marginBottom: 20, fontSize: 16, lineHeight: 1.6 }}>
@@ -893,6 +899,33 @@ function Preview({ intro, segments, onBack, onStartOver }) {
     </div>
   );
 }
+
+/* Print handling, self-contained so no separate CSS file edits are needed:
+   - .no-print elements (Back / Start over / Print buttons) are hidden when printing.
+   - Background colors/images print by default, without the user needing to
+     manually enable "Background graphics" in the print dialog.
+   - .print-page-break forces the calendar section to start on a fresh page,
+     so the printed/PDF output is a clean 2-pager: overview, then calendars.
+   - .print-avoid-break keeps the overview table and each segment's calendar
+     from being awkwardly split across a page boundary. */
+const PRINT_STYLES = `
+  @media print {
+    .no-print { display: none !important; }
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    .print-page-break {
+      break-before: page;
+      page-break-before: always;
+    }
+    .print-avoid-break {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+`;
 
 function ReportFooter() {
   return (
@@ -966,7 +999,7 @@ function ServiceMatrix({ intro, segments }) {
   ];
 
   return (
-    <div style={{ overflowX: 'auto', marginBottom: 44 }}>
+    <div className="print-avoid-break" style={{ overflowX: 'auto', marginBottom: 44 }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
         <thead>
           <tr>
@@ -1075,7 +1108,7 @@ function SegmentCalendar({ seg, label }) {
   const groupsPresent = [...new Set([...points.map((p) => p.group), ...continuous.map((c) => c.group)])];
 
   return (
-    <div style={{ marginBottom: 40, border: `1.5px solid ${COLOR.border}`, borderRadius: 16, padding: '26px 24px', background: COLOR.white }}>
+    <div className="print-avoid-break" style={{ marginBottom: 40, border: `1.5px solid ${COLOR.border}`, borderRadius: 16, padding: '26px 24px', background: COLOR.white }}>
       <h3 style={{ fontFamily: FONT_HEAD, fontSize: 20, color: COLOR.oxblood, marginTop: 0, marginBottom: 14 }}>{label} — Annual Service Calendar</h3>
 
       {groupsPresent.length === 0 ? (
