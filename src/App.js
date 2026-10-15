@@ -321,12 +321,47 @@ function ProgressBar({ fraction }) {
   );
 }
 
-function QuestionShell({ eyebrow, progressFraction, children, onBack, onNext, nextLabel = 'Next', showBack = true, nextDisabled }) {
+/* Intro banner shown on the first screen only */
+function IntroBanner() {
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <span style={{ display: 'inline-block', background: COLOR.sage, color: COLOR.paper, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 4, marginBottom: 14 }}>
+        Completely free
+      </span>
+      <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(30px, 6vw, 40px)', color: COLOR.oxblood, lineHeight: 1.1, margin: '0 0 12px' }}>
+        Service Model Builder
+      </h1>
+      <p style={{ fontSize: 18, lineHeight: 1.5, color: COLOR.nearBlack, margin: '0 0 20px' }}>
+        Answer a few questions about how you serve your clients. At the end, you'll get two print-ready pages built from your answers.
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
+        <IntroDeliverable title="One-Page Client Service Overview" text="What clients get when they work with you, on a single page." />
+        <IntroDeliverable title="Client Service Calendar" text="Your year of client touchpoints, laid out month by month." />
+      </div>
+      <p style={{ fontSize: 15, lineHeight: 1.5, color: '#6B6459', margin: 0 }}>
+        Use them with clients and prospects, send them to a designer, or put them on your website.
+      </p>
+      <div style={{ height: 1, background: COLOR.border, marginTop: 24 }} />
+    </div>
+  );
+}
+
+function IntroDeliverable({ title, text }) {
+  return (
+    <div style={{ borderTop: `3px solid ${COLOR.tan}`, paddingTop: 10 }}>
+      <div style={{ fontFamily: FONT_HEAD, fontSize: 18, color: COLOR.oxblood, marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 15, lineHeight: 1.45, color: COLOR.nearBlack }}>{text}</div>
+    </div>
+  );
+}
+
+function QuestionShell({ header, eyebrow, progressFraction, children, onBack, onNext, nextLabel = 'Next', showBack = true, nextDisabled }) {
   return (
     <div style={pageWrap}>
       <div style={cardWrap}>
         <div style={datumRule} />
         <div style={{ paddingLeft: 26 }}>
+          {header}
           {eyebrow ? (
             <div style={{ fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.oxblood, fontWeight: 700, marginBottom: 10 }}>{eyebrow}</div>
           ) : null}
@@ -426,7 +461,7 @@ export default function App() {
 
   if (step.id === 'firmName') {
     return (
-      <QuestionShell eyebrow="Getting started" progressFraction={(safeStepIndex + 1) / steps.length} showBack={false} onNext={goNext}>
+      <QuestionShell header={<IntroBanner />} eyebrow="Getting started" progressFraction={(safeStepIndex + 1) / steps.length} showBack={false} onNext={goNext}>
         <FieldLabel required>What's your firm name?</FieldLabel>
         <HelpText>This appears as the title of your one-pager.</HelpText>
         <TextInput value={intro.firmName} onChange={(e) => updateIntro({ firmName: e.target.value })} placeholder="e.g., Align Advisor Consulting" />
