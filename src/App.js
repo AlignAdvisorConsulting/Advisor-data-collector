@@ -328,7 +328,7 @@ function IntroBanner() {
   return (
     <div style={{ marginBottom: 28 }}>
       <span style={{ display: 'inline-block', background: COLOR.sage, color: COLOR.paper, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 4, marginBottom: 14 }}>
-        Completely free
+        free
       </span>
       <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(30px, 6vw, 40px)', color: COLOR.oxblood, lineHeight: 1.1, margin: '0 0 12px' }}>
         Service Model Builder
