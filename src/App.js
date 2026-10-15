@@ -23,6 +23,8 @@ const FONT_HEAD = "'Constantia', 'Iowan Old Style', 'Palatino Linotype', Palatin
 const FONT_BODY = "'Corbel', 'Segoe UI', 'Calibri', system-ui, -apple-system, sans-serif";
 
 const BOOKING_URL = 'https://www.alignadvisorconsulting.com/booking-calendar/15-minute-intro-meeting';
+const SITE_URL = 'https://www.alignadvisorconsulting.com';
+const CONTACT_EMAIL = 'info@alignadvisorconsulting.com';
 
 /* ---------------------------------------------------------------
    Static option lists
@@ -326,7 +328,7 @@ function IntroBanner() {
   return (
     <div style={{ marginBottom: 28 }}>
       <span style={{ display: 'inline-block', background: COLOR.sage, color: COLOR.paper, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 4, marginBottom: 14 }}>
-        free
+        Completely free
       </span>
       <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(30px, 6vw, 40px)', color: COLOR.oxblood, lineHeight: 1.1, margin: '0 0 12px' }}>
         Service Model Builder
@@ -357,27 +359,30 @@ function IntroDeliverable({ title, text }) {
 
 function QuestionShell({ header, eyebrow, progressFraction, children, onBack, onNext, nextLabel = 'Next', showBack = true, nextDisabled }) {
   return (
-    <div style={pageWrap}>
-      <div style={cardWrap}>
-        <div style={datumRule} />
-        <div style={{ paddingLeft: 26 }}>
-          {header}
-          {eyebrow ? (
-            <div style={{ fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.oxblood, fontWeight: 700, marginBottom: 10 }}>{eyebrow}</div>
-          ) : null}
-          <ProgressBar fraction={progressFraction} />
-          {children}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 28, gap: 12 }}>
-            {showBack ? <SecondaryButton onClick={onBack}>Back</SecondaryButton> : <span />}
-            <PrimaryButton onClick={onNext} disabled={nextDisabled}>{nextLabel}</PrimaryButton>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: COLOR.paper }}>
+      <div style={pageWrap}>
+        <div style={cardWrap}>
+          <div style={datumRule} />
+          <div style={{ paddingLeft: 26 }}>
+            {header}
+            {eyebrow ? (
+              <div style={{ fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase', color: COLOR.oxblood, fontWeight: 700, marginBottom: 10 }}>{eyebrow}</div>
+            ) : null}
+            <ProgressBar fraction={progressFraction} />
+            {children}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 28, gap: 12 }}>
+              {showBack ? <SecondaryButton onClick={onBack}>Back</SecondaryButton> : <span />}
+              <PrimaryButton onClick={onNext} disabled={nextDisabled}>{nextLabel}</PrimaryButton>
+            </div>
           </div>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }
 
-const pageWrap = { minHeight: '100vh', background: COLOR.paper, display: 'flex', justifyContent: 'center', padding: '32px 16px 60px', fontFamily: FONT_BODY };
+const pageWrap = { flex: 1, background: COLOR.paper, display: 'flex', justifyContent: 'center', padding: '32px 16px 60px', fontFamily: FONT_BODY };
 const cardWrap = { width: '100%', maxWidth: 640, position: 'relative' };
 const datumRule = { position: 'absolute', left: 0, top: 4, bottom: 4, width: 4, background: COLOR.oxblood, borderRadius: 2 };
 
@@ -930,7 +935,7 @@ function Preview({ intro, segments, onBack, onStartOver }) {
           </div>
         </div>
       </div>
-      <ReportFooter />
+      <SiteFooter />
     </div>
   );
 }
@@ -962,17 +967,66 @@ const PRINT_STYLES = `
   }
 `;
 
-function ReportFooter() {
+/* Site footer — shown at the bottom of every screen.
+   Logo + website + email + complimentary consultation button.
+   The button is hidden when printing; logo, website, and email still print.
+   On narrow screens the pieces stack and the button goes full width. */
+const FOOTER_STYLES = `
+  .site-footer a:hover { opacity: 0.85; }
+  @media (max-width: 640px) {
+    .site-footer-inner { flex-direction: column; align-items: flex-start !important; }
+    .site-footer-cta { width: 100%; box-sizing: border-box; }
+  }
+`;
+
+function FooterIcon({ type }) {
+  const common = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: COLOR.tan, strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, style: { flexShrink: 0 } };
+  if (type === 'mail') {
+    return (
+      <svg {...common}>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 7l9 6 9-6" />
+      </svg>
+    );
+  }
   return (
-    <div style={{ background: COLOR.oxblood, width: '100%', padding: '24px 16px' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-        <img src="/align-logo.png" alt="Align Advisor Consulting" style={{ height: 34, width: 'auto', display: 'block' }} />
-        <div style={{ color: COLOR.paper, fontSize: 13, textAlign: 'right', lineHeight: 1.6 }}>
-          <div style={{ opacity: 0.95 }}>Helping advisors confidently and systematically align their value with their worth.</div>
-          <div style={{ opacity: 0.75 }}>info@alignadvisorconsulting.com · alignadvisorconsulting.com</div>
+    <svg {...common}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+    </svg>
+  );
+}
+
+function SiteFooter() {
+  const linkStyle = { color: COLOR.paper, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 };
+  return (
+    <footer className="site-footer" style={{ background: COLOR.oxblood, width: '100%', padding: '24px 16px', fontFamily: FONT_BODY, boxSizing: 'border-box' }}>
+      <style>{FOOTER_STYLES}</style>
+      <div className="site-footer-inner" style={{ maxWidth: 900, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+        <a href={SITE_URL} target="_blank" rel="noopener noreferrer" aria-label="Align Advisor Consulting website">
+          <img src="/align-logo-footer.png" alt="Align Advisor Consulting" style={{ height: 48, width: 'auto', display: 'block' }} />
+        </a>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+          <a href={SITE_URL} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+            <FooterIcon type="web" />
+            alignadvisorconsulting.com
+          </a>
+          <a href={`mailto:${CONTACT_EMAIL}`} style={linkStyle}>
+            <FooterIcon type="mail" />
+            {CONTACT_EMAIL}
+          </a>
         </div>
+        <a
+          className="site-footer-cta no-print"
+          href={BOOKING_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ background: COLOR.tan, color: COLOR.oxblood, padding: '11px 18px', borderRadius: 8, fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+        >
+          Book a complimentary consultation <span aria-hidden="true">→</span>
+        </a>
       </div>
-    </div>
+    </footer>
   );
 }
 
